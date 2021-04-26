@@ -22,27 +22,28 @@ const colours = [
 
 const mix = {
   body: [
-    'arm',
-    'leg',
-    'hand',
+    'arms',
+    'legs',
+  //  'hand',
     'chest',
     'hips',
-    'knees',
-    'neck',
-    'elbows',
-    'feet',
+  //  'knees',
+  //  'neck',
+  //  'elbows',
+  //  'feet',
     'head'
   ],
   shapes: [
-    '_',
-    '|',
+ //   '_',
+ //   '|',
     '+',
     'X',
     '=',
+    '||',
     '~',
     'O',
     'T',
-    'Y',
+   // 'Y',
     'U',
     '/\\',
     'V'
@@ -79,10 +80,6 @@ const getRandomNumber = (min, max) => {
 
 /* the main page for the index route of this app */
 const Prompts = function() {
-  const [selectedMix, setSelectedMix] = React.useState({body: true, shapes: true, patterns: true, grooves: true});
-  const [prompts, setPrompts] = React.useState([]);
-  const [colour, setColour] = React.useState(colours[getRandomNumber(0, colours.length - 1)]);
-  
   const handleSingleCheck = (e) => {
     setSelectedMix({
       ...selectedMix,
@@ -90,38 +87,40 @@ const Prompts = function() {
     })
   };
   
+  const generatePrompts = () => Object.keys(selectedMix)
+        .filter(k => selectedMix[k] === true)
+        .map(m => mix[m][getRandomNumber(0, mix[m].length - 1)]);
+  
+  const [selectedMix, setSelectedMix] = React.useState({body: true, shapes: true, patterns: false, grooves: false});
+  const [prompts, setPrompts] = React.useState(generatePrompts());
+  const [colour, setColour] = React.useState(colours[getRandomNumber(0, colours.length - 1)]);
+  
   React.useEffect(() => {
     const timeout = setTimeout(() => {
       setColour(colours[getRandomNumber(0, colours.length - 1)]);
+      setPrompts(generatePrompts());
       
-      const newPrompts = Object.keys(selectedMix)
-        .filter(k => selectedMix[k] === true)
-        .map(m => mix[m][getRandomNumber(0, mix[m].length - 1)]);
-      setPrompts(newPrompts);
-      
-    }, 30000);
+    }, 60000);
     
     return () => clearTimeout(timeout);
   }, [colour, prompts]);
   
   return (
     <div>
-
+      {prompts.map(p => <h1 style={{color: colour, fontFamily: 'Arial', fontSize: 200}}>{p}</h1>)}
+      
       <h2>Select from:</h2>
         {Object.keys(mix).map(k => {
           return (
-            <div>
+            <span>
               <input type="checkbox" 
                 name={k} 
                 checked={selectedMix[k]} 
                 onChange={handleSingleCheck} 
               />
               {k}
-            </div>
+            </span>
           )})}
-      
-      <h2>Prompts:</h2>
-      {prompts.map(p => <h1 style={{color: colour, fontFamily: 'Arial', fontSize: 100}}>{p}</h1>)}
     </div>
   );
 }
